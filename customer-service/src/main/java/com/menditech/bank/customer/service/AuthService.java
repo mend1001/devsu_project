@@ -14,10 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final long TOKEN_EXPIRATION_SECONDS = 3600L;
+
     private final ClientRepository clientRepository;
     private final JwtService jwtService;
+    private final UserSessionService userSessionService;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public JwtResponse login(LoginRequest request) {
         ClientEntity client = clientRepository.findByCode(request.getClientCode())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid client code or password"));
@@ -36,10 +39,12 @@ public class AuthService {
 
         String token = jwtService.generateToken(client.getCode());
 
+        userSessionService.registerSession(client, token, TOKEN_EXPIRATION_SECONDS);
+
         return JwtResponse.builder()
                 .token(token)
                 .tokenType("Bearer")
-                .expiresIn(3600L)
+                .expiresIn(TOKEN_EXPIRATION_SECONDS)
                 .build();
     }
 }
