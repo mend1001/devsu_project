@@ -11,6 +11,7 @@ import com.menditech.bank.customer.exception.ResourceNotFoundException;
 import com.menditech.bank.customer.mapper.ClientMapper;
 import com.menditech.bank.customer.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class ClientService {
     private final CountryRepository countryRepository;
     private final CountryPhoneCodeRepository countryPhoneCodeRepository;
     private final ClientMapper clientMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public ClientResponse createClient(ClientCreateRequest request) {
@@ -90,7 +92,7 @@ public class ClientService {
                 .person(savedPerson)
                 .role(role)
                 .code(request.getClientCode())
-                .passwordHash(request.getPassword())
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .passwordSalt(null)
                 .status(request.getIsActive() ? ClientStatus.ACTIVE : ClientStatus.INACTIVE)
                 .isActive(request.getIsActive())

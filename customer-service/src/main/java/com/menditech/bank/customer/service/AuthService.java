@@ -7,6 +7,7 @@ import com.menditech.bank.customer.exception.InvalidCredentialsException;
 import com.menditech.bank.customer.repository.ClientRepository;
 import com.menditech.bank.customer.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,7 @@ public class AuthService {
     private final ClientRepository clientRepository;
     private final JwtService jwtService;
     private final UserSessionService userSessionService;
-
+    private final PasswordEncoder passwordEncoder;
     @Transactional
     public JwtResponse login(LoginRequest request) {
         ClientEntity client = clientRepository.findByCode(request.getClientCode())
@@ -33,7 +34,7 @@ public class AuthService {
             throw new InvalidCredentialsException("Client is locked");
         }
 
-        if (!client.getPasswordHash().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), client.getPasswordHash())) {
             throw new InvalidCredentialsException("Invalid client code or password");
         }
 
