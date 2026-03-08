@@ -9,18 +9,6 @@ The system exposes RESTful APIs documented with **Swagger/OpenAPI**, supports **
 
 ---
 
-## Project Structure
-devsu_project/
-│
-├── customer-service/ # Microservice responsible for customers and personal information
-├── account-service/ # Microservice responsible for accounts and movements
-├── infra/ # Infrastructure resources (Docker, database initialization, messaging)
-│
-└── README.md
-
-
----
-
 ## Main Technologies
 
 - **Java 21**
