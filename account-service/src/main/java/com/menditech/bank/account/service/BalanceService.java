@@ -2,13 +2,12 @@ package com.menditech.bank.account.service;
 
 import com.menditech.bank.account.entity.AccountEntity;
 import com.menditech.bank.account.entity.MovementTypeEntity;
-import lombok.RequiredArgsConstructor;
+import com.menditech.bank.account.exception.InsufficientBalanceException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
 @Service
-@RequiredArgsConstructor
 public class BalanceService {
 
     public void applyMovement(AccountEntity account,
@@ -20,7 +19,13 @@ public class BalanceService {
         if (movementType.getSign() == 1) {
             current = current.add(amount);
         } else {
-            current = current.subtract(amount);
+            BigDecimal newBalance = current.subtract(amount);
+
+            if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+                throw new InsufficientBalanceException("Saldo no disponible");
+            }
+
+            current = newBalance;
         }
 
         account.setCurrentBalance(current);

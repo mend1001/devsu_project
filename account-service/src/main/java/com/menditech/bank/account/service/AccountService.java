@@ -5,6 +5,7 @@ import com.menditech.bank.account.dto.response.AccountResponse;
 import com.menditech.bank.account.entity.AccountEntity;
 import com.menditech.bank.account.entity.AccountTypeEntity;
 import com.menditech.bank.account.enums.AccountStatus;
+import com.menditech.bank.account.exception.ResourceNotFoundException;
 import com.menditech.bank.account.mapper.AccountMapper;
 import com.menditech.bank.account.repository.AccountRepository;
 import com.menditech.bank.account.repository.AccountTypeRepository;
@@ -28,7 +29,7 @@ public class AccountService {
     public AccountResponse createAccount(AccountCreateRequest request) {
 
         AccountTypeEntity type = accountTypeRepository.findByCode(request.getAccountTypeCode())
-                .orElseThrow(() -> new RuntimeException("Account type not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Account type not found"));
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -74,7 +75,7 @@ public class AccountService {
     @Transactional(readOnly = true)
     public AccountResponse getAccountByNumber(String number) {
         AccountEntity account = accountRepository.findByNumber(number)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
         return accountMapper.toResponse(account);
     }

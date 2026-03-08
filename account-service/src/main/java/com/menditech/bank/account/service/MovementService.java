@@ -4,6 +4,7 @@ import com.menditech.bank.account.dto.request.MovementCreateRequest;
 import com.menditech.bank.account.dto.response.MovementResponse;
 import com.menditech.bank.account.entity.*;
 import com.menditech.bank.account.enums.MovementStatus;
+import com.menditech.bank.account.exception.ResourceNotFoundException;
 import com.menditech.bank.account.mapper.MovementMapper;
 import com.menditech.bank.account.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -29,16 +30,16 @@ public class MovementService {
     public MovementResponse createMovement(MovementCreateRequest request) {
 
         AccountEntity account = accountRepository.findByNumber(request.getAccountNumber())
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
         MovementTypeEntity movementType = movementTypeRepository.findByCode(request.getMovementTypeCode())
-                .orElseThrow(() -> new RuntimeException("Movement type not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Movement type not found"));
 
         TransactionChannelEntity channel = null;
 
         if (request.getTransactionChannelCode() != null) {
             channel = transactionChannelRepository.findByCode(request.getTransactionChannelCode())
-                    .orElseThrow(() -> new RuntimeException("Channel not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Channel not found"));
         }
 
         BigDecimal previousBalance = account.getCurrentBalance();
