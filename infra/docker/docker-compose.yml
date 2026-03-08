@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  postgres-bank:
+    image: postgres:16
+    container_name: postgres-bank
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mend1001
+      POSTGRES_PASSWORD: mend1001_2026
+      POSTGRES_DB: bank_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_bank_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - bank-network
+
+volumes:
+  postgres_bank_data:
+
+networks:
+  bank-network:
+    driver: bridge
