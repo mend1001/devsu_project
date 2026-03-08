@@ -22,6 +22,14 @@ public class AuthService {
         ClientEntity client = clientRepository.findByCode(request.getClientCode())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid client code or password"));
 
+        if (!Boolean.TRUE.equals(client.getIsActive())) {
+            throw new InvalidCredentialsException("Client is inactive");
+        }
+
+        if (Boolean.TRUE.equals(client.getIsLocked())) {
+            throw new InvalidCredentialsException("Client is locked");
+        }
+
         if (!client.getPasswordHash().equals(request.getPassword())) {
             throw new InvalidCredentialsException("Invalid client code or password");
         }

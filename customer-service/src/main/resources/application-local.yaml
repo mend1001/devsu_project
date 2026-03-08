@@ -1,3 +1,35 @@
+server:
+  port: 8081
+
 spring:
-  application:
-    name: customer-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank_db?currentSchema=customer_service
+    username: mend1001
+    password: mend1001_2026
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: customer_service
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+security:
+  jwt:
+    secret: mend1001-super-secret-key-bank-2026-very-secure-123456
+    expiration-ms: 3600000
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
