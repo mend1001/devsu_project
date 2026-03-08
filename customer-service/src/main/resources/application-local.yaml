@@ -25,7 +25,7 @@ spring:
 
 security:
   jwt:
-    secret: mend1001-super-secret-key-bank-2026-very-secure-123456
+    secret: mend1001-devsu-s3cur1ty%jwt%#1n1t14l_Key_YY26MM03DD07
     expiration-ms: 3600000
 
 springdoc:
