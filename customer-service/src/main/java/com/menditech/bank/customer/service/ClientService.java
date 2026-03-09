@@ -15,6 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.menditech.bank.customer.messaging.event.ClientCreatedEvent;
+import com.menditech.bank.customer.messaging.producer.ClientEventPublisher;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,6 +32,7 @@ public class ClientService {
     private final CountryPhoneCodeRepository countryPhoneCodeRepository;
     private final ClientMapper clientMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ClientEventPublisher clientEventPublisher;
 
     @Transactional
     public ClientResponse createClient(ClientCreateRequest request) {
@@ -105,6 +109,23 @@ public class ClientService {
                 .build();
 
         ClientEntity savedClient = clientRepository.save(client);
+        clientEventPublisher.publishClientCreated(
+                ClientCreatedEvent.builder()
+                        .clientId(savedClient.getId())
+                        .personId(savedPerson.getId())
+                        .roleId(role.getId())
+                        .clientCode(savedClient.getCode())
+                        .fullName(savedPerson.getFullName())
+                        .identificationNumber(savedPerson.getIdentificationNumber())
+                        .email(savedPerson.getEmail())
+                        .phoneNumber(savedPerson.getMobileNumber() != null
+                                ? savedPerson.getMobileNumber()
+                                : savedPerson.getPhoneNumber())
+                        .status(savedClient.getStatus().name())
+                        .isActive(savedClient.getIsActive())
+                        .eventDate(LocalDateTime.now())
+                        .build()
+        );
         return clientMapper.toResponse(savedClient);
     }
 

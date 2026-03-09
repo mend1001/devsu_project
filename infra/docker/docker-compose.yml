@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
   postgres-bank:
@@ -14,6 +13,19 @@ services:
     volumes:
       - postgres_bank_data:/var/lib/postgresql/data
       - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - bank-network
+
+  rabbitmq-bank:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-bank
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
     networks:
       - bank-network
 
