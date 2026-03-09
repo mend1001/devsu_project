@@ -1,6 +1,6 @@
 package com.menditech.bank.customer.exception;
 
-import com.menditech.bank.customer.dto.common.ApiResponse;
+import com.menditech.bank.customer.dto.common.ApiCommonResponse;
 import com.menditech.bank.customer.dto.response.ApiErrorResponse;
 import com.menditech.bank.customer.util.ApiResponseBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<ApiErrorResponse>> handleResourceNotFound(ResourceNotFoundException ex) {
+    public ResponseEntity<ApiCommonResponse<ApiErrorResponse>> handleResourceNotFound(ResourceNotFoundException ex) {
         log.warn("Customer-service resource not found: {}", ex.getMessage());
 
         ApiErrorResponse error = ApiErrorResponse.builder()
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiResponse<ApiErrorResponse>> handleBusinessException(BusinessException ex) {
+    public ResponseEntity<ApiCommonResponse<ApiErrorResponse>> handleBusinessException(BusinessException ex) {
         log.warn("Customer-service business exception: {}", ex.getMessage());
 
         ApiErrorResponse error = ApiErrorResponse.builder()
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ApiResponse<ApiErrorResponse>> handleInvalidCredentials(InvalidCredentialsException ex) {
+    public ResponseEntity<ApiCommonResponse<ApiErrorResponse>> handleInvalidCredentials(InvalidCredentialsException ex) {
         log.warn("Customer-service invalid credentials attempt: {}", ex.getMessage());
 
         ApiErrorResponse error = ApiErrorResponse.builder()
@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<ApiErrorResponse>> handleValidationException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiCommonResponse<ApiErrorResponse>> handleValidationException(MethodArgumentNotValidException ex) {
         List<String> details = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<ApiErrorResponse>> handleGenericException(Exception ex) {
+    public ResponseEntity<ApiCommonResponse<ApiErrorResponse>> handleGenericException(Exception ex) {
         log.error("Customer-service unexpected error", ex);
 
         ApiErrorResponse error = ApiErrorResponse.builder()

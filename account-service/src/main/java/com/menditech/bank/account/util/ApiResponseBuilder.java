@@ -1,6 +1,6 @@
 package com.menditech.bank.account.util;
 
-import com.menditech.bank.account.dto.common.ApiResponse;
+import com.menditech.bank.account.dto.common.ApiCommonResponse;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -10,8 +10,8 @@ public final class ApiResponseBuilder {
     private ApiResponseBuilder() {
     }
 
-    public static <T> ApiResponse<T> success(HttpStatus httpStatus, String message, T data) {
-        return ApiResponse.<T>builder()
+    public static <T> ApiCommonResponse<T> success(HttpStatus httpStatus, String message, T data) {
+        return ApiCommonResponse.<T>builder()
                 .httpStatus(httpStatus.value())
                 .status(httpStatus.name())
                 .timestamp(LocalDateTime.now())
@@ -20,8 +20,8 @@ public final class ApiResponseBuilder {
                 .build();
     }
 
-    public static <T> ApiResponse<T> error(HttpStatus httpStatus, String message, T data) {
-        return ApiResponse.<T>builder()
+    public static <T> ApiCommonResponse<T> error(HttpStatus httpStatus, String message, T data) {
+        return ApiCommonResponse.<T>builder()
                 .httpStatus(httpStatus.value())
                 .status(httpStatus.name())
                 .timestamp(LocalDateTime.now())

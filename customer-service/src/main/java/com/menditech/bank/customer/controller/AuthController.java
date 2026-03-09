@@ -1,6 +1,6 @@
 package com.menditech.bank.customer.controller;
 
-import com.menditech.bank.customer.dto.common.ApiResponse;
+import com.menditech.bank.customer.dto.common.ApiCommonResponse;
 import com.menditech.bank.customer.dto.request.LoginRequest;
 import com.menditech.bank.customer.dto.response.JwtResponse;
 import com.menditech.bank.customer.service.AuthService;
@@ -19,7 +19,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<JwtResponse>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiCommonResponse<JwtResponse>> login(@Valid @RequestBody LoginRequest request) {
         JwtResponse response = authService.login(request);
         return ResponseEntity.ok(
                 ApiResponseBuilder.success(HttpStatus.OK, "Login successful", response)

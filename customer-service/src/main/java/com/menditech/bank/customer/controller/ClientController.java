@@ -1,6 +1,6 @@
 package com.menditech.bank.customer.controller;
 
-import com.menditech.bank.customer.dto.common.ApiResponse;
+import com.menditech.bank.customer.dto.common.ApiCommonResponse;
 import com.menditech.bank.customer.dto.request.ClientCreateRequest;
 import com.menditech.bank.customer.dto.request.ClientUpdateRequest;
 import com.menditech.bank.customer.dto.response.ClientResponse;
@@ -22,14 +22,14 @@ public class ClientController {
     private final ClientService clientService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ClientResponse>> createClient(@Valid @RequestBody ClientCreateRequest request) {
+    public ResponseEntity<ApiCommonResponse<ClientResponse>> createClient(@Valid @RequestBody ClientCreateRequest request) {
         ClientResponse response = clientService.createClient(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponseBuilder.success(HttpStatus.CREATED, "Client created successfully", response));
     }
 
     @GetMapping("/{clientId}")
-    public ResponseEntity<ApiResponse<ClientResponse>> getClientById(@PathVariable Long clientId) {
+    public ResponseEntity<ApiCommonResponse<ClientResponse>> getClientById(@PathVariable Long clientId) {
         ClientResponse response = clientService.getClientById(clientId);
         return ResponseEntity.ok(
                 ApiResponseBuilder.success(HttpStatus.OK, "Client retrieved successfully", response)
@@ -37,7 +37,7 @@ public class ClientController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ClientResponse>>> getAllClients() {
+    public ResponseEntity<ApiCommonResponse<List<ClientResponse>>> getAllClients() {
         List<ClientResponse> response = clientService.getAllClients();
         return ResponseEntity.ok(
                 ApiResponseBuilder.success(HttpStatus.OK, "Clients retrieved successfully", response)
@@ -45,7 +45,7 @@ public class ClientController {
     }
 
     @PutMapping("/{clientId}")
-    public ResponseEntity<ApiResponse<ClientResponse>> updateClient(
+    public ResponseEntity<ApiCommonResponse<ClientResponse>> updateClient(
             @PathVariable Long clientId,
             @Valid @RequestBody ClientUpdateRequest request
     ) {

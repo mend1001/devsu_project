@@ -1,6 +1,6 @@
 package com.menditech.bank.account.controller;
 
-import com.menditech.bank.account.dto.common.ApiResponse;
+import com.menditech.bank.account.dto.common.ApiCommonResponse;
 import com.menditech.bank.account.dto.request.MovementCreateRequest;
 import com.menditech.bank.account.dto.response.MovementResponse;
 import com.menditech.bank.account.service.MovementService;
@@ -19,7 +19,7 @@ public class MovementController {
     private final MovementService movementService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<MovementResponse>> createMovement(
+    public ResponseEntity<ApiCommonResponse<MovementResponse>> createMovement(
             @Valid @RequestBody MovementCreateRequest request
     ) {
         MovementResponse response = movementService.createMovement(request);
