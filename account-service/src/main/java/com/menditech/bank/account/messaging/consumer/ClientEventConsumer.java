@@ -20,28 +20,36 @@ public class ClientEventConsumer {
 
     @RabbitListener(queues = RabbitMqConfig.CLIENT_CREATED_QUEUE)
     public void handleClientCreated(ClientCreatedEvent event) {
-        log.info("Received client.created event: clientId={}, clientCode={}",
+        log.info("Received client.created event for clientId={}, clientCode={}",
                 event.getClientId(), event.getClientCode());
 
-        ClientSnapshotEntity snapshot = ClientSnapshotEntity.builder()
-                .clientId(event.getClientId())
-                .personId(event.getPersonId())
-                .roleId(event.getRoleId())
-                .clientCode(event.getClientCode())
-                .fullName(event.getFullName())
-                .identificationNumber(event.getIdentificationNumber())
-                .email(event.getEmail())
-                .phoneNumber(event.getPhoneNumber())
-                .status(event.getStatus())
-                .isActive(event.getIsActive())
-                .sourceEvent("client.created")
-                .lastEventAt(event.getEventDate())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        ClientSnapshotEntity snapshot = clientSnapshotRepository.findByClientId(event.getClientId())
+                .orElseGet(() -> ClientSnapshotEntity.builder()
+                        .clientId(event.getClientId())
+                        .createdAt(LocalDateTime.now())
+                        .build());
+
+        boolean isNew = snapshot.getId() == null;
+
+        snapshot.setPersonId(event.getPersonId());
+        snapshot.setRoleId(event.getRoleId());
+        snapshot.setClientCode(event.getClientCode());
+        snapshot.setFullName(event.getFullName());
+        snapshot.setIdentificationNumber(event.getIdentificationNumber());
+        snapshot.setEmail(event.getEmail());
+        snapshot.setPhoneNumber(event.getPhoneNumber());
+        snapshot.setStatus(event.getStatus());
+        snapshot.setIsActive(event.getIsActive());
+        snapshot.setSourceEvent("client.created");
+        snapshot.setLastEventAt(event.getEventDate());
+        snapshot.setUpdatedAt(LocalDateTime.now());
 
         clientSnapshotRepository.save(snapshot);
 
-        log.info("Client snapshot saved for clientId={}", event.getClientId());
+        if (isNew) {
+            log.info("Client snapshot created for clientId={}", event.getClientId());
+        } else {
+            log.info("Client snapshot updated for clientId={}", event.getClientId());
+        }
     }
 }

@@ -4,6 +4,9 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -17,14 +20,31 @@ public class RabbitMqConfig {
     public static final String CLIENT_CREATED_QUEUE = "client.created.queue";
     public static final String CLIENT_CREATED_ROUTING_KEY = "client.created";
 
+    public static final String BANK_DLX = "bank.dlx";
+    public static final String CLIENT_CREATED_DLQ = "client.created.dlq";
+    public static final String CLIENT_CREATED_DLQ_ROUTING_KEY = "client.created.dlq";
+
     @Bean
     public DirectExchange bankExchange() {
         return new DirectExchange(BANK_EXCHANGE);
     }
 
     @Bean
+    public DirectExchange deadLetterExchange() {
+        return new DirectExchange(BANK_DLX);
+    }
+
+    @Bean
     public Queue clientCreatedQueue() {
-        return new Queue(CLIENT_CREATED_QUEUE, true);
+        return QueueBuilder.durable(CLIENT_CREATED_QUEUE)
+                .withArgument("x-dead-letter-exchange", BANK_DLX)
+                .withArgument("x-dead-letter-routing-key", CLIENT_CREATED_DLQ_ROUTING_KEY)
+                .build();
+    }
+
+    @Bean
+    public Queue clientCreatedDlq() {
+        return QueueBuilder.durable(CLIENT_CREATED_DLQ).build();
     }
 
     @Bean
@@ -35,17 +55,29 @@ public class RabbitMqConfig {
     }
 
     @Bean
+    public Binding clientCreatedDlqBinding(Queue clientCreatedDlq, DirectExchange deadLetterExchange) {
+        return BindingBuilder.bind(clientCreatedDlq)
+                .to(deadLetterExchange)
+                .with(CLIENT_CREATED_DLQ_ROUTING_KEY);
+    }
+
+    @Bean
     public MessageConverter jsonMessageConverter() {
         return new JacksonJsonMessageConverter();
     }
 
     @Bean
     public RabbitTemplate rabbitTemplate(
-            org.springframework.amqp.rabbit.connection.ConnectionFactory connectionFactory,
+            ConnectionFactory connectionFactory,
             MessageConverter jsonMessageConverter
     ) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(jsonMessageConverter);
         return rabbitTemplate;
+    }
+
+    @Bean
+    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+        return new RabbitAdmin(connectionFactory);
     }
 }
