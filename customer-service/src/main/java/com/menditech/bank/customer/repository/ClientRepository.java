@@ -8,9 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface ClientRepository extends JpaRepository<ClientEntity, Long> {
+
     Optional<ClientEntity> findByCode(String code);
+
     Optional<ClientEntity> findByPersonId(Long personId);
+
     boolean existsByCode(String code);
+
     long countByStatus(ClientStatus status);
 
     @Query(value = "SELECT nextval('customer_service.client_code_seq')", nativeQuery = true)
