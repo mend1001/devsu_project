@@ -49,7 +49,7 @@ services:
       RABBITMQ_PORT: 5672
       RABBITMQ_USERNAME: guest
       RABBITMQ_PASSWORD: guest
-      JWT_SECRET: mend1001-super-secret-key-bank-2026-very-secure-123456
+      JWT_SECRET: mend1001-devsu-bank-2026-s3cur3%K3Y#V4L1D473-080320226_
     ports:
       - "8081:8081"
     networks:
@@ -75,7 +75,7 @@ services:
       RABBITMQ_PORT: 5672
       RABBITMQ_USERNAME: guest
       RABBITMQ_PASSWORD: guest
-      JWT_SECRET: mend1001-super-secret-key-bank-2026-very-secure-123456
+      JWT_SECRET: mend1001-devsu-bank-2026-s3cur3%K3Y#V4L1D473-080320226_
     ports:
       - "8082:8082"
     networks:

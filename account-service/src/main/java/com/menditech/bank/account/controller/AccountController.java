@@ -5,6 +5,7 @@ import com.menditech.bank.account.dto.request.AccountCreateRequest;
 import com.menditech.bank.account.dto.response.AccountResponse;
 import com.menditech.bank.account.service.AccountService;
 import com.menditech.bank.account.util.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor
+@Tag(name = "Accounts", description = "Operations related to bank accounts")
 public class AccountController {
 
     private final AccountService accountService;
