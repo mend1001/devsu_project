@@ -1,0 +1,316 @@
+{
+  "info": {
+    "_postman_id": "326fc07d-ac4c-4ac1-8198-21463ea91a15",
+    "name": "Prueba devsu",
+    "description": "StartFragment\n\n## 🧪 Banking API Test Collection\n\n**Version:** 1.0.0  \n**Environment:** Local Development  \n**Base URLs:**\n\n- Client Service: `http://localhost:8081`\n    \n- Account Service: `http://localhost:8082`\n    \n\n---\n\n### 📋 Collection Overview\n\nComprehensive API test suite for the **Banking Microservices System**, covering all functional requirements (F1-F7) with pre-configured requests, test scripts, and example responses.\n\n---\n\n### 🗂️ Folder Structure\n\nTable\n\n| Folder | Description | Endpoints |\n| --- | --- | --- |\n| **🏦 Clients** | Person/Customer management | `POST /api/clientes`  <br>`GET /api/clientes`  <br>`PUT /api/cliente/{id}`  <br>`DELETE /api/clientes/{id}` |\n| **💳 Accounts** | Bank account operations | `POST /api/cuentas`  <br>`GET /api/cuentas`  <br>`PATCH /api/cuentas/{id}` |\n| **💰 Movements** | Financial transactions | `POST /api/movimientos`  <br>`GET /api/movimientos` |\n| **📊 Reports** | Account statements | `GET /api/reportes?fechaInicio={date}&fechaFin={date}&clienteId={id}` |\n| **🔧 Admin** | Health checks & diagnostics | `GET /actuator/health`  <br>`GET /actuator/info` |\n\n---\n\n### 🎯 Test Scenarios Covered\n\n#### Functional Requirements\n\n- ✅ **F1**: Complete CRUD operations for all entities\n    \n- ✅ **F2**: Transaction registration with balance updates\n    \n- ✅ **F3**: \"Insufficient Balance\" error validation\n    \n- ✅ **F4**: Account statement reports with date filtering\n    \n- ✅ **F5-F7**: Integration testing support\n    \n\nEndFragment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "21996327",
+    "_collection_link": "https://go.postman.co/collection/21996327-326fc07d-ac4c-4ac1-8198-21463ea91a15?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "item": [
+        {
+          "name": "Auth",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"clientCode\": \"CLI2722163663\",\r\n    \"password\": \"1234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8081/api/auth/login",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Accounts",
+      "item": [
+        {
+          "name": "Create",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJDTEkyNzIyMTYzNjYzIiwiaWF0IjoxNzczMDIwMzg3LCJleHAiOjE3NzMwMjM5ODd9.xQl7dmkkLYvUSDcCkdsByCNJRIAvvqCZRn-YxBQx6Ik8LuYep5tLQ6OEii2HQsJ9",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"clientId\": 1,\r\n    \"accountTypeCode\": \"SAVINGS\",\r\n    \"iban\": null,\r\n    \"currencyCode\": \"COP\",\r\n    \"initialBalance\": 4000,\r\n    \"overdraftLimit\": 0,\r\n    \"interestRate\": 0.00,\r\n    \"monthlyFee\": 0,\r\n    \"minimumBalance\": 0,\r\n    \"statementDay\": 17,\r\n    \"branchCode\": \"BOG001\",\r\n    \"alias\": \"Main Savings\",\r\n    \"isPrimary\": true,\r\n    \"isActive\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8082/api/accounts",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "accounts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get client by id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJDTEkyNzIyMTYzNjYzIiwiaWF0IjoxNzczMDE1MjMyLCJleHAiOjE3NzMwMTg4MzJ9.OWtiP0pYO42DBdFzaYxiMh4fRjMwcsZ3upRMOXsAuSnjq",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8082/api/accounts/client/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "accounts",
+                "client",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get account by number",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8082/api/accounts/client/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "accounts",
+                "client",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Movements",
+      "item": [
+        {
+          "name": "create movements",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"accountNumber\": \"478758\",\r\n    \"movementTypeCode\": \"DEPOSIT\",\r\n    \"transactionChannelCode\": \"WEB\",\r\n    \"amount\": 500,\r\n    \"externalReference\": \"DEP001\",\r\n    \"description\": \"Initial deposit adjustment\",\r\n    \"notes\": \"Test deposit\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8082/api/movements",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "movements"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "build report",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"clientId\": 1,\r\n    \"startDate\": \"2026-03-01\",\r\n    \"endDate\": \"2026-03-31\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8082/api/reports",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "reports"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Client",
+      "item": [
+        {
+          "name": "create client",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJDTEkyNzIyMTYzNjYzIiwiaWF0IjoxNzczMDIwMzg3LCJleHAiOjE3NzMwMjM5ODd9.xQl7dmkkLYvUSDcCkdsByCNJRIAvvqCZRn-YxBQx6Ik8LuYep5tLQ6OEii2HQsJ9",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"identificationType\": \"CC\",\r\n  \"identificationNumber\": \"2722163663\",\r\n  \"firstName\": \"Miguel\",\r\n  \"middleName\": \"Angel\",\r\n  \"lastName\": \"Mendigaño\",\r\n  \"secondLastName\": \"Arismendy\",\r\n  \"gender\": \"MALE\",\r\n  \"email\": \"miguel.angel@test.com\",\r\n  \"phoneNumber\": \"6010000000\",\r\n  \"mobileNumber\": \"3000000000\",\r\n  \"addressLine1\": \"Calle 123 #45-67\",\r\n  \"addressLine2\": \"Apto 101\",\r\n  \"countryId\": 1,\r\n  \"countryPhoneCodeId\": 1,\r\n  \"city\": \"Bogota\",\r\n  \"stateRegion\": \"Cundinamarca\",\r\n  \"postalCode\": \"110111\",\r\n  \"password\": \"1234\",\r\n  \"roleCode\": \"CLIENT\",\r\n  \"isActive\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8081/api/clients",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "clients"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get client by id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJDTEkyNzIyMTYzNjYzIiwiaWF0IjoxNzczMDIxODM3LCJleHAiOjE3NzMwMjU0Mzd9.YPti9xHp_IezsqYp73KFt-Ecn3ZYOKFFdaF734-hC9K8x5Lg_TmIeeMXUH5BQYyz",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8081/api/clients/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "clients",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get clients",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJDTEkyNzIyMTYzNjYzIiwiaWF0IjoxNzczMDIxODM3LCJleHAiOjE3NzMwMjU0Mzd9.YPti9xHp_IezsqYp73KFt-Ecn3ZYOKFFdaF734-hC9K8x5Lg_TmIeeMXUH5BQYyz",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8081/api/clients",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "clients"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
