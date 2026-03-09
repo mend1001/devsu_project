@@ -19,10 +19,6 @@ public class AccountCreateRequest {
     @Size(max = 20, message = "Account type code must not exceed 20 characters")
     private String accountTypeCode;
 
-    @NotBlank(message = "Account number is required")
-    @Size(max = 20, message = "Account number must not exceed 20 characters")
-    private String accountNumber;
-
     @Size(max = 34, message = "IBAN must not exceed 34 characters")
     private String iban;
 

@@ -24,6 +24,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountTypeRepository accountTypeRepository;
     private final AccountMapper accountMapper;
+    private final AccountNumberGeneratorService accountNumberGeneratorService;
 
     @Transactional
     public AccountResponse createAccount(AccountCreateRequest request) {
@@ -31,12 +32,15 @@ public class AccountService {
         AccountTypeEntity type = accountTypeRepository.findByCode(request.getAccountTypeCode())
                 .orElseThrow(() -> new ResourceNotFoundException("Account type not found"));
 
+        String generatedAccountNumber =
+                accountNumberGeneratorService.generateNextAccountNumber(request.getAccountTypeCode());
+
         LocalDateTime now = LocalDateTime.now();
 
         AccountEntity account = AccountEntity.builder()
                 .clientId(request.getClientId())
                 .accountType(type)
-                .number(request.getAccountNumber())
+                .number(generatedAccountNumber)
                 .iban(request.getIban())
                 .currencyCode(request.getCurrencyCode())
                 .openedAt(now)
@@ -79,4 +83,5 @@ public class AccountService {
 
         return accountMapper.toResponse(account);
     }
+
 }
