@@ -1,5 +1,5 @@
-
 services:
+
   postgres-bank:
     image: postgres:16
     container_name: postgres-bank
@@ -20,12 +20,64 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq-bank
     restart: unless-stopped
-    ports:
-      - "5672:5672"
-      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - bank-network
+
+  customer-service:
+    build:
+      context: ../../customer-service
+      dockerfile: Dockerfile
+    container_name: customer-service
+    restart: unless-stopped
+    depends_on:
+      - postgres-bank
+      - rabbitmq-bank
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: postgres-bank
+      DB_PORT: 5432
+      DB_NAME: bank_db
+      DB_USERNAME: mend1001
+      DB_PASSWORD: mend1001_2026
+      RABBITMQ_HOST: rabbitmq-bank
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      JWT_SECRET: mend1001-super-secret-key-bank-2026-very-secure-123456
+    ports:
+      - "8081:8081"
+    networks:
+      - bank-network
+
+  account-service:
+    build:
+      context: ../../account-service
+      dockerfile: Dockerfile
+    container_name: account-service
+    restart: unless-stopped
+    depends_on:
+      - postgres-bank
+      - rabbitmq-bank
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: postgres-bank
+      DB_PORT: 5432
+      DB_NAME: bank_db
+      DB_USERNAME: mend1001
+      DB_PASSWORD: mend1001_2026
+      RABBITMQ_HOST: rabbitmq-bank
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      JWT_SECRET: mend1001-super-secret-key-bank-2026-very-secure-123456
+    ports:
+      - "8082:8082"
     networks:
       - bank-network
 

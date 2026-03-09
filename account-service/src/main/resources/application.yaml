@@ -3,11 +3,6 @@ spring:
     name: account-service
   profiles:
     active: local
-  rabbitmq:
-    host: ${RABBITMQ_HOST}
-    port: ${RABBITMQ_PORT}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
 
 server:
   port: 8082
