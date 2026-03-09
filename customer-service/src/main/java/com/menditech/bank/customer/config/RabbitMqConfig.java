@@ -21,8 +21,10 @@ public class RabbitMqConfig {
     public static final String CLIENT_UPDATED_ROUTING_KEY = "client.updated";
 
     public static final String BANK_DLX = "bank.dlx";
+
     public static final String CLIENT_CREATED_DLQ = "client.created.dlq";
     public static final String CLIENT_CREATED_DLQ_ROUTING_KEY = "client.created.dlq";
+
     public static final String CLIENT_UPDATED_DLQ = "client.updated.dlq";
     public static final String CLIENT_UPDATED_DLQ_ROUTING_KEY = "client.updated.dlq";
 
@@ -64,22 +66,30 @@ public class RabbitMqConfig {
 
     @Bean
     public Binding clientCreatedBinding(Queue clientCreatedQueue, DirectExchange bankExchange) {
-        return BindingBuilder.bind(clientCreatedQueue).to(bankExchange).with(CLIENT_CREATED_ROUTING_KEY);
+        return BindingBuilder.bind(clientCreatedQueue)
+                .to(bankExchange)
+                .with(CLIENT_CREATED_ROUTING_KEY);
     }
 
     @Bean
     public Binding clientUpdatedBinding(Queue clientUpdatedQueue, DirectExchange bankExchange) {
-        return BindingBuilder.bind(clientUpdatedQueue).to(bankExchange).with(CLIENT_UPDATED_ROUTING_KEY);
+        return BindingBuilder.bind(clientUpdatedQueue)
+                .to(bankExchange)
+                .with(CLIENT_UPDATED_ROUTING_KEY);
     }
 
     @Bean
     public Binding clientCreatedDlqBinding(Queue clientCreatedDlq, DirectExchange deadLetterExchange) {
-        return BindingBuilder.bind(clientCreatedDlq).to(deadLetterExchange).with(CLIENT_CREATED_DLQ_ROUTING_KEY);
+        return BindingBuilder.bind(clientCreatedDlq)
+                .to(deadLetterExchange)
+                .with(CLIENT_CREATED_DLQ_ROUTING_KEY);
     }
 
     @Bean
     public Binding clientUpdatedDlqBinding(Queue clientUpdatedDlq, DirectExchange deadLetterExchange) {
-        return BindingBuilder.bind(clientUpdatedDlq).to(deadLetterExchange).with(CLIENT_UPDATED_DLQ_ROUTING_KEY);
+        return BindingBuilder.bind(clientUpdatedDlq)
+                .to(deadLetterExchange)
+                .with(CLIENT_UPDATED_DLQ_ROUTING_KEY);
     }
 
     @Bean
@@ -88,7 +98,8 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter jsonMessageConverter) {
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory,
+                                         MessageConverter jsonMessageConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(jsonMessageConverter);
         return rabbitTemplate;
