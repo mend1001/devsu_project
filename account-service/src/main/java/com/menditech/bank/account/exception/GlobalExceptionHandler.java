@@ -3,19 +3,23 @@ package com.menditech.bank.account.exception;
 import com.menditech.bank.account.dto.common.ApiResponse;
 import com.menditech.bank.account.dto.response.ApiErrorResponse;
 import com.menditech.bank.account.util.ApiResponseBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<ApiErrorResponse>> handleResourceNotFound(ResourceNotFoundException ex) {
+        log.warn("Account-service resource not found: {}", ex.getMessage());
+
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .errorCode("RESOURCE_NOT_FOUND")
                 .details(List.of(ex.getMessage()))
@@ -27,6 +31,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<ApiErrorResponse>> handleBusinessException(BusinessException ex) {
+        log.warn("Account-service business exception: {}", ex.getMessage());
+
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .errorCode("BUSINESS_ERROR")
                 .details(List.of(ex.getMessage()))
@@ -38,6 +44,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InsufficientBalanceException.class)
     public ResponseEntity<ApiResponse<ApiErrorResponse>> handleInsufficientBalance(InsufficientBalanceException ex) {
+        log.warn("Account-service insufficient balance: {}", ex.getMessage());
+
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .errorCode("INSUFFICIENT_BALANCE")
                 .details(List.of(ex.getMessage()))
@@ -55,6 +63,8 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .toList();
 
+        log.warn("Account-service validation error: {}", details);
+
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .errorCode("VALIDATION_ERROR")
                 .details(details)
@@ -66,6 +76,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<ApiErrorResponse>> handleGenericException(Exception ex) {
+        log.error("Account-service unexpected error", ex);
+
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .errorCode("INTERNAL_SERVER_ERROR")
                 .details(List.of(ex.getMessage()))
