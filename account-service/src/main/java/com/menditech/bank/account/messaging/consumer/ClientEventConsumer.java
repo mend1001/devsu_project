@@ -5,11 +5,13 @@ import com.menditech.bank.account.entity.ClientSnapshotEntity;
 import com.menditech.bank.account.messaging.event.ClientCreatedEvent;
 import com.menditech.bank.account.repository.ClientSnapshotRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ClientEventConsumer {
@@ -18,6 +20,9 @@ public class ClientEventConsumer {
 
     @RabbitListener(queues = RabbitMqConfig.CLIENT_CREATED_QUEUE)
     public void handleClientCreated(ClientCreatedEvent event) {
+        log.info("Received client.created event: clientId={}, clientCode={}",
+                event.getClientId(), event.getClientCode());
+
         ClientSnapshotEntity snapshot = ClientSnapshotEntity.builder()
                 .clientId(event.getClientId())
                 .personId(event.getPersonId())
@@ -36,5 +41,7 @@ public class ClientEventConsumer {
                 .build();
 
         clientSnapshotRepository.save(snapshot);
+
+        log.info("Client snapshot saved for clientId={}", event.getClientId());
     }
 }

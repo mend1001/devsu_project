@@ -67,10 +67,6 @@ public class ClientCreateRequest {
     @Size(max = 20, message = "Postal code must not exceed 20 characters")
     private String postalCode;
 
-    @NotBlank(message = "Client code is required")
-    @Size(max = 30, message = "Client code must not exceed 30 characters")
-    private String clientCode;
-
     @NotBlank(message = "Password is required")
     @Size(max = 255, message = "Password must not exceed 255 characters")
     private String password;
