@@ -5,6 +5,7 @@ import com.menditech.bank.customer.dto.response.ClientResponse;
 import com.menditech.bank.customer.entity.*;
 import com.menditech.bank.customer.enums.RoleCode;
 import com.menditech.bank.customer.mapper.ClientMapper;
+import com.menditech.bank.customer.messaging.producer.ClientEventPublisher;
 import com.menditech.bank.customer.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,8 @@ class ClientServiceTest {
     private ClientMapper clientMapper;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private ClientEventPublisher clientEventPublisher;
 
     @InjectMocks
     private ClientService clientService;
@@ -186,5 +189,6 @@ class ClientServiceTest {
         verify(personRepository).save(any(PersonEntity.class));
         verify(clientRepository).save(any(ClientEntity.class));
         verify(clientMapper).toResponse(savedClient);
+        verify(clientEventPublisher).publishClientCreated(any());
     }
 }
