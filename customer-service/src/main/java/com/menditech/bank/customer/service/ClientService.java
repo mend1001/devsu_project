@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.menditech.bank.customer.messaging.event.ClientCreatedEvent;
 import com.menditech.bank.customer.messaging.producer.ClientEventPublisher;
+import java.security.SecureRandom;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +34,11 @@ public class ClientService {
     private final ClientMapper clientMapper;
     private final PasswordEncoder passwordEncoder;
     private final ClientEventPublisher clientEventPublisher;
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final String CLIENT_CODE_PREFIX = "CLI";
+    private static final int CLIENT_CODE_DIGITS = 10;
+    private static final int MAX_CLIENT_CODE_ATTEMPTS = 20;
 
     @Transactional
     public ClientResponse createClient(ClientCreateRequest request) {
@@ -56,6 +62,12 @@ public class ClientService {
 
         RoleEntity role = roleRepository.findByCode(roleCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+
+        String generatedClientCode = generateClientCode();
+
+        if (clientRepository.existsByCode(generatedClientCode)) {
+            throw new BusinessException("Client code already exists");
+        }
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -95,7 +107,7 @@ public class ClientService {
         ClientEntity client = ClientEntity.builder()
                 .person(savedPerson)
                 .role(role)
-                .code(request.getClientCode())
+                .code(generatedClientCode)
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .passwordSalt(null)
                 .status(request.getIsActive() ? ClientStatus.ACTIVE : ClientStatus.INACTIVE)
@@ -109,6 +121,7 @@ public class ClientService {
                 .build();
 
         ClientEntity savedClient = clientRepository.save(client);
+
         clientEventPublisher.publishClientCreated(
                 ClientCreatedEvent.builder()
                         .clientId(savedClient.getId())
@@ -126,6 +139,7 @@ public class ClientService {
                         .eventDate(LocalDateTime.now())
                         .build()
         );
+
         return clientMapper.toResponse(savedClient);
     }
 
@@ -210,10 +224,6 @@ public class ClientService {
         if (request.getEmail() != null && personRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException("Email already exists");
         }
-
-        if (clientRepository.existsByCode(request.getClientCode())) {
-            throw new BusinessException("Client code already exists");
-        }
     }
 
     private String buildFullName(String firstName, String middleName, String lastName, String secondLastName) {
@@ -223,5 +233,13 @@ public class ClientService {
                 lastName != null ? lastName.trim() : "",
                 secondLastName != null ? secondLastName.trim() : ""
         ).trim().replaceAll("\\s+", " ");
+    }
+    private String generateClientCode() {
+
+        Long sequenceValue = clientRepository.getNextClientCodeSequence();
+
+        String formattedNumber = String.format("%010d", sequenceValue);
+
+        return "CLI" + formattedNumber;
     }
 }

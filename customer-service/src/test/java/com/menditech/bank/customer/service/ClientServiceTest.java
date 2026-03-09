@@ -73,7 +73,6 @@ class ClientServiceTest {
                 .city("Bogota")
                 .stateRegion("Cundinamarca")
                 .postalCode("110111")
-                .clientCode("CLI2722163663")
                 .password("1234")
                 .roleCode("CLIENT")
                 .isActive(true)
@@ -169,7 +168,6 @@ class ClientServiceTest {
     void shouldCreateClientSuccessfully() {
         when(personRepository.existsByIdentificationNumber(request.getIdentificationNumber())).thenReturn(false);
         when(personRepository.existsByEmail(request.getEmail())).thenReturn(false);
-        when(clientRepository.existsByCode(request.getClientCode())).thenReturn(false);
         when(countryRepository.findById(1L)).thenReturn(Optional.of(country));
         when(countryPhoneCodeRepository.findById(1L)).thenReturn(Optional.of(phoneCode));
         when(roleRepository.findByCode(RoleCode.CLIENT)).thenReturn(Optional.of(role));
