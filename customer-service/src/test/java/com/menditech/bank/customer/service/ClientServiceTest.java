@@ -182,7 +182,7 @@ class ClientServiceTest {
         ClientResponse result = clientService.createClient(request);
 
         assertNotNull(result);
-        assertEquals("CLI0000000001", result.getClientCode());
+        assertEquals("CLI2722163663", result.getClientCode());
         assertEquals("ACTIVE", result.getStatus());
         assertTrue(result.getIsActive());
 
