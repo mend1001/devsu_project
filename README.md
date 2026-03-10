@@ -158,7 +158,7 @@ POST /api/clients
 GET /api/accounts  
 POST /api/movements
 
-## Unit and Integration Testing
+## Unit Testing
 
 The solution includes:
 
@@ -166,6 +166,44 @@ The solution includes:
 - Integration tests for API endpoints
 
 JUnit and Mockito were used.
+
+## Integration Test
+
+The project includes an integration test for the `ClientController`, covering the real HTTP flow for the client management API.
+
+This test validates the interaction between:
+
+- Controller
+- Service
+- Repository
+- Database
+
+The integration test is located at:
+
+customer-service/src/test/java/com/menditech/bank/customer/controller/ClientControllerIntegrationTest.java|
+```textmate
+Purpose
+This test was implemented to satisfy functional requirement F6 – Integration Test.
+
+It verifies that the application can process real HTTP requests and generate the expected responses while interacting with the persistence layer.
+
+Important Notes
+The integration test uses real data validations, so the following fields must be unique for each new execution:
+
+identificationNumber
+
+email
+
+If the same values are reused in multiple executions, the test may fail because the application enforces uniqueness constraints in the database.
+
+Recommendation
+Before re-running the create client integration test, update these fields in the request body:
+
+identificationNumber
+
+email
+```
+
 
 ## Docker Deployment
 
