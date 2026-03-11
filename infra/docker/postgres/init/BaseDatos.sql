@@ -119,6 +119,13 @@ CREATE TABLE customer_service.client (
         CHECK (cli_status IN ('ACTIVE', 'INACTIVE', 'BLOCKED', 'SUSPENDED'))
 );
 
+CREATE SEQUENCE customer_service.client_code_seq
+START WITH 1
+INCREMENT BY 1
+MINVALUE 1
+NO MAXVALUE
+CACHE 10;
+
 CREATE TABLE customer_service.user_session (
     uss_id BIGSERIAL PRIMARY KEY,
     cli_id BIGINT NOT NULL,
@@ -640,3 +647,89 @@ now(),
 'SYSTEM',
 'SYSTEM'
 );
+SELECT setval(
+    'customer_service.person_per_id_seq',
+    (SELECT COALESCE(MAX(per_id), 1) FROM customer_service.person),
+    true
+);
+
+SELECT setval(
+    'customer_service.client_cli_id_seq',
+    (SELECT COALESCE(MAX(cli_id), 1) FROM customer_service.client),
+    true
+);
+
+SELECT setval(
+    'customer_service.country_cou_id_seq',
+    (SELECT COALESCE(MAX(cou_id), 1) FROM customer_service.country),
+    true
+);
+
+SELECT setval(
+    'customer_service.country_phone_code_cpc_id_seq',
+    (SELECT COALESCE(MAX(cpc_id), 1) FROM customer_service.country_phone_code),
+    true
+);
+
+SELECT setval(
+    'customer_service.role_rol_id_seq',
+    (SELECT COALESCE(MAX(rol_id), 1) FROM customer_service.role),
+    true
+);
+
+SELECT setval(
+    'customer_service.client_cli_id_seq',
+    (SELECT COALESCE(MAX(cli_id), 1) FROM customer_service.client),
+    true
+);
+
+SELECT setval(
+    'customer_service.country_cou_id_seq',
+    (SELECT COALESCE(MAX(cou_id), 1) FROM customer_service.country),
+    true
+);
+
+SELECT setval(
+    'customer_service.country_phone_code_cpc_id_seq',
+    (SELECT COALESCE(MAX(cpc_id), 1) FROM customer_service.country_phone_code),
+    true
+);
+
+SELECT setval(
+    'customer_service.role_rol_id_seq',
+    (SELECT COALESCE(MAX(rol_id), 1) FROM customer_service.role),
+    true
+);
+
+SELECT setval(
+    'customer_service.person_per_id_seq',
+    (SELECT COALESCE(MAX(per_id), 1) FROM customer_service.person),
+    true
+);
+
+SELECT setval(
+    'customer_service.client_cli_id_seq',
+    (SELECT COALESCE(MAX(cli_id), 1) FROM customer_service.client),
+    true
+);
+
+SELECT setval(
+    'customer_service.user_session_uss_id_seq',
+    (SELECT COALESCE(MAX(uss_id), 1) FROM customer_service.user_session),
+    true
+);
+
+SELECT setval(
+    'customer_service.client_status_history_csh_id_seq',
+    (SELECT COALESCE(MAX(csh_id), 1) FROM customer_service.client_status_history),
+    true
+);
+
+SELECT setval(
+    'customer_service.client_event_outbox_ceo_id_seq',
+    (SELECT COALESCE(MAX(ceo_id), 1) FROM customer_service.client_event_outbox),
+    true
+);
+
+ALTER TABLE customer_service.client
+ADD CONSTRAINT uk_client_code UNIQUE (cli_code);

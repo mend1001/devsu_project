@@ -1,6 +1,5 @@
-version: "3.9"
-
 services:
+
   postgres-bank:
     image: postgres:16
     container_name: postgres-bank
@@ -14,6 +13,71 @@ services:
     volumes:
       - postgres_bank_data:/var/lib/postgresql/data
       - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - bank-network
+
+  rabbitmq-bank:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-bank
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - bank-network
+
+  customer-service:
+    build:
+      context: ../../customer-service
+      dockerfile: Dockerfile
+    container_name: customer-service
+    restart: unless-stopped
+    depends_on:
+      - postgres-bank
+      - rabbitmq-bank
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: postgres-bank
+      DB_PORT: 5432
+      DB_NAME: bank_db
+      DB_USERNAME: mend1001
+      DB_PASSWORD: mend1001_2026
+      RABBITMQ_HOST: rabbitmq-bank
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      JWT_SECRET: mend1001-devsu-bank-2026-s3cur3%K3Y#V4L1D473-080320226_
+    ports:
+      - "8081:8081"
+    networks:
+      - bank-network
+
+  account-service:
+    build:
+      context: ../../account-service
+      dockerfile: Dockerfile
+    container_name: account-service
+    restart: unless-stopped
+    depends_on:
+      - postgres-bank
+      - rabbitmq-bank
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: postgres-bank
+      DB_PORT: 5432
+      DB_NAME: bank_db
+      DB_USERNAME: mend1001
+      DB_PASSWORD: mend1001_2026
+      RABBITMQ_HOST: rabbitmq-bank
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      JWT_SECRET: mend1001-devsu-bank-2026-s3cur3%K3Y#V4L1D473-080320226_
+    ports:
+      - "8082:8082"
     networks:
       - bank-network
 

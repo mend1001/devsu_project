@@ -5,6 +5,7 @@ import com.menditech.bank.customer.dto.response.ClientResponse;
 import com.menditech.bank.customer.entity.*;
 import com.menditech.bank.customer.enums.RoleCode;
 import com.menditech.bank.customer.mapper.ClientMapper;
+import com.menditech.bank.customer.messaging.producer.ClientEventPublisher;
 import com.menditech.bank.customer.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
+import com.menditech.bank.customer.repository.ClientStatusHistoryRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -38,7 +39,10 @@ class ClientServiceTest {
     private ClientMapper clientMapper;
     @Mock
     private PasswordEncoder passwordEncoder;
-
+    @Mock
+    private ClientEventPublisher clientEventPublisher;
+    @Mock
+    private ClientStatusHistoryRepository clientStatusHistoryRepository;
     @InjectMocks
     private ClientService clientService;
 
@@ -70,7 +74,6 @@ class ClientServiceTest {
                 .city("Bogota")
                 .stateRegion("Cundinamarca")
                 .postalCode("110111")
-                .clientCode("CLI2722163663")
                 .password("1234")
                 .roleCode("CLIENT")
                 .isActive(true)
@@ -166,13 +169,14 @@ class ClientServiceTest {
     void shouldCreateClientSuccessfully() {
         when(personRepository.existsByIdentificationNumber(request.getIdentificationNumber())).thenReturn(false);
         when(personRepository.existsByEmail(request.getEmail())).thenReturn(false);
-        when(clientRepository.existsByCode(request.getClientCode())).thenReturn(false);
         when(countryRepository.findById(1L)).thenReturn(Optional.of(country));
         when(countryPhoneCodeRepository.findById(1L)).thenReturn(Optional.of(phoneCode));
         when(roleRepository.findByCode(RoleCode.CLIENT)).thenReturn(Optional.of(role));
+        when(clientRepository.getNextClientCodeSequence()).thenReturn(1L);
         when(passwordEncoder.encode("1234")).thenReturn("$2a$10$Ta/ZwTffYi5XisR/X8nwNu/4FpOFs/F9GFh0UtXJFFZGs/IzdfbV2");
         when(personRepository.save(any(PersonEntity.class))).thenReturn(savedPerson);
         when(clientRepository.save(any(ClientEntity.class))).thenReturn(savedClient);
+        when(clientStatusHistoryRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(clientMapper.toResponse(savedClient)).thenReturn(response);
 
         ClientResponse result = clientService.createClient(request);
@@ -185,6 +189,8 @@ class ClientServiceTest {
         verify(passwordEncoder).encode("1234");
         verify(personRepository).save(any(PersonEntity.class));
         verify(clientRepository).save(any(ClientEntity.class));
+        verify(clientStatusHistoryRepository).save(any());
         verify(clientMapper).toResponse(savedClient);
+        verify(clientEventPublisher).publishClientCreated(any());
     }
 }

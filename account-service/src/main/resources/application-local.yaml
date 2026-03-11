@@ -1,3 +1,29 @@
 spring:
-  application:
-    name: account-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank_db?currentSchema=account_service
+    username: mend1001
+    password: mend1001_2026
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        default_schema: account_service
+        format_sql: true
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+security:
+  jwt:
+    secret: mend1001-devsu-s3cur1ty%jwt%#1n1t14l_Key_YY26MM03DD07
+    expiration-ms: 3600000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
