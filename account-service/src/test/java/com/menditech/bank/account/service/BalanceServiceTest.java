@@ -3,6 +3,7 @@ package com.menditech.bank.account.service;
 import com.menditech.bank.account.entity.AccountEntity;
 import com.menditech.bank.account.entity.MovementTypeEntity;
 import com.menditech.bank.account.exception.InsufficientBalanceException;
+import com.menditech.bank.account.util.MovementSign;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -19,10 +20,11 @@ class BalanceServiceTest {
                 .currentBalance(new BigDecimal("1000.00"))
                 .availableBalance(new BigDecimal("1000.00"))
                 .blockedAmount(BigDecimal.ZERO)
+                .overdraftLimit(BigDecimal.ZERO)
                 .build();
 
         MovementTypeEntity movementType = MovementTypeEntity.builder()
-                .sign((short) 1)
+                .sign(MovementSign.CREDIT)
                 .build();
 
         balanceService.applyMovement(account, movementType, new BigDecimal("500.00"));
@@ -37,10 +39,11 @@ class BalanceServiceTest {
                 .currentBalance(new BigDecimal("1000.00"))
                 .availableBalance(new BigDecimal("1000.00"))
                 .blockedAmount(BigDecimal.ZERO)
+                .overdraftLimit(BigDecimal.ZERO)
                 .build();
 
         MovementTypeEntity movementType = MovementTypeEntity.builder()
-                .sign((short) -1)
+                .sign(MovementSign.DEBIT)
                 .build();
 
         balanceService.applyMovement(account, movementType, new BigDecimal("300.00"));
@@ -55,10 +58,11 @@ class BalanceServiceTest {
                 .currentBalance(new BigDecimal("200.00"))
                 .availableBalance(new BigDecimal("200.00"))
                 .blockedAmount(BigDecimal.ZERO)
+                .overdraftLimit(BigDecimal.ZERO)
                 .build();
 
         MovementTypeEntity movementType = MovementTypeEntity.builder()
-                .sign((short) -1)
+                .sign(MovementSign.DEBIT)
                 .build();
 
         InsufficientBalanceException exception = assertThrows(
@@ -66,6 +70,6 @@ class BalanceServiceTest {
                 () -> balanceService.applyMovement(account, movementType, new BigDecimal("500.00"))
         );
 
-        assertEquals("Saldo no disponible", exception.getMessage());
+        assertEquals("Insufficient balance for this operation", exception.getMessage());
     }
 }

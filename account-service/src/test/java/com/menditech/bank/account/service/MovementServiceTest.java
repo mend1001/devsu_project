@@ -154,6 +154,6 @@ class MovementServiceTest {
                 () -> movementService.createMovement(request)
         );
 
-        assertEquals("Account not found", exception.getMessage());
+        assertEquals("Account not found: 999999", exception.getMessage());
     }
 }
