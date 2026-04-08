@@ -3,7 +3,7 @@ package com.menditech.bank.account.controller;
 import com.menditech.bank.account.dto.common.ApiCommonResponse;
 import com.menditech.bank.account.dto.request.MovementCreateRequest;
 import com.menditech.bank.account.dto.response.MovementResponse;
-import com.menditech.bank.account.service.MovementService;
+import com.menditech.bank.account.service.serviceImpl.MovementServiceImpl;
 import com.menditech.bank.account.util.ApiResponseBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Movements", description = "Operations related to account movements and transactions")
 public class MovementController {
 
-    private final MovementService movementService;
+    private final MovementServiceImpl movementService;
 
     @Operation(
             summary = "Create account movement",

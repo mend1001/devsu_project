@@ -11,6 +11,8 @@ import com.menditech.bank.account.repository.AccountRepository;
 import com.menditech.bank.account.repository.MovementRepository;
 import com.menditech.bank.account.repository.MovementTypeRepository;
 import com.menditech.bank.account.repository.TransactionChannelRepository;
+import com.menditech.bank.account.service.serviceImpl.BalanceServiceImpl;
+import com.menditech.bank.account.service.serviceImpl.MovementServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,10 +46,10 @@ class MovementServiceTest {
     private MovementMapper movementMapper;
 
     @Mock
-    private BalanceService balanceService;
+    private BalanceServiceImpl balanceService;
 
     @InjectMocks
-    private MovementService movementService;
+    private MovementServiceImpl movementService;
 
     @Test
     void shouldCreateMovementSuccessfully() {
@@ -154,6 +156,6 @@ class MovementServiceTest {
                 () -> movementService.createMovement(request)
         );
 
-        assertEquals("Account not found", exception.getMessage());
+        assertEquals("Account not found: 999999", exception.getMessage());
     }
 }

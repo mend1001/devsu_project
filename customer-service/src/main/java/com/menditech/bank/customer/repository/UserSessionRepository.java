@@ -15,14 +15,14 @@ public interface UserSessionRepository extends JpaRepository<UserSessionEntity, 
 
     @Modifying
     @Query("""
-            update UserSessionEntity us
-               set us.isActive = false,
-                   us.closedAt = :closedAt,
-                   us.updatedAt = :updatedAt
-             where us.client.id = :clientId
-               and us.isActive = true
-            """)
-    void deactivateActiveSessionsByClientId(@Param("clientId") Long clientId,
-                                            @Param("closedAt") LocalDateTime closedAt,
-                                            @Param("updatedAt") LocalDateTime updatedAt);
+        update UserSessionEntity us
+           set us.isActive = false,
+               us.closedAt = :closedAt,
+               us.updatedAt = :updatedAt
+         where us.client.id = :clientId
+           and us.isActive = true
+        """)
+    int deactivateActiveSessionsByClientId(@Param("clientId") Long clientId,
+                                           @Param("closedAt") LocalDateTime closedAt,
+                                           @Param("updatedAt") LocalDateTime updatedAt);
 }

@@ -9,7 +9,10 @@ import org.springframework.stereotype.Component;
 public class ClientMapper {
 
     public ClientResponse toResponse(ClientEntity client) {
+        if (client == null) throw new IllegalArgumentException("ClientEntity cannot be null");
         PersonEntity person = client.getPerson();
+        if (person == null) throw new IllegalStateException(
+                "Client " + client.getId() + " has no associated person");
 
         return ClientResponse.builder()
                 .clientId(client.getId())

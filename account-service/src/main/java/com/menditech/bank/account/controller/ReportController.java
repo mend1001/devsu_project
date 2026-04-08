@@ -3,7 +3,8 @@ package com.menditech.bank.account.controller;
 import com.menditech.bank.account.dto.common.ApiCommonResponse;
 import com.menditech.bank.account.dto.request.ReportRequest;
 import com.menditech.bank.account.dto.response.StatementReportResponse;
-import com.menditech.bank.account.service.StatementService;
+
+import com.menditech.bank.account.service.serviceImpl.StatementServiceImpl;
 import com.menditech.bank.account.util.ApiResponseBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Reports", description = "Operations related to account statements and transaction reports")
 public class ReportController {
 
-    private final StatementService statementService;
+    private final StatementServiceImpl statementService;
 
     @Operation(
             summary = "Generate account statement report",
