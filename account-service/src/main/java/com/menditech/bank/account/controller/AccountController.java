@@ -2,6 +2,7 @@ package com.menditech.bank.account.controller;
 
 import com.menditech.bank.account.dto.common.ApiCommonResponse;
 import com.menditech.bank.account.dto.request.AccountCreateRequest;
+import com.menditech.bank.account.dto.request.AccountUpdateRequest;
 import com.menditech.bank.account.dto.response.AccountResponse;
 import com.menditech.bank.account.service.AccountService;
 import com.menditech.bank.account.util.ApiResponseBuilder;
@@ -48,6 +49,53 @@ public class AccountController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponseBuilder.success(HttpStatus.CREATED, "Account created successfully", response));
+    }
+
+    @Operation(
+            summary = "Update an existing account",
+            description = "Updates account information such as status, overdraft limit, or blocked amount. Account number and type cannot be changed."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Account updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "404", description = "Account not found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "409", description = "Account is closed or inactive")
+    })
+    @PutMapping("/{accountNumber}")
+    public ResponseEntity<ApiCommonResponse<AccountResponse>> updateAccount(
+            @Parameter(description = "Bank account number", example = "478761", required = true)
+            @PathVariable String accountNumber,
+            @Parameter(description = "Account update request body", required = true)
+            @Valid @RequestBody AccountUpdateRequest request
+    ) {
+        AccountResponse response = accountService.updateAccount(accountNumber, request);
+
+        return ResponseEntity.ok(
+                ApiResponseBuilder.success(HttpStatus.OK, "Account updated successfully", response)
+        );
+    }
+
+    @Operation(
+            summary = "Close/Delete an account",
+            description = "Performs logical deletion of an account by closing it. The account is marked as inactive and closed, but remains in the database for historical records."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Account closed successfully"),
+            @ApiResponse(responseCode = "404", description = "Account not found"),
+            @ApiResponse(responseCode = "400", description = "Account has pending movements or non-zero balance"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @DeleteMapping("/{accountNumber}")
+    public ResponseEntity<ApiCommonResponse<Void>> deleteAccount(
+            @Parameter(description = "Bank account number to close", example = "478761", required = true)
+            @PathVariable String accountNumber
+    ) {
+        accountService.deleteAccount(accountNumber);
+
+        return ResponseEntity.ok(
+                ApiResponseBuilder.success(HttpStatus.OK, "Account closed successfully", null)
+        );
     }
 
     @Operation(
