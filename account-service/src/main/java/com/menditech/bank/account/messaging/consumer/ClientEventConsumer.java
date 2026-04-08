@@ -24,33 +24,15 @@ public class ClientEventConsumer {
         log.info("Received client.created event for clientId={}, clientCode={}",
                 event.getClientId(), event.getClientCode());
 
-        ClientSnapshotEntity snapshot = clientSnapshotRepository.findByClientId(event.getClientId())
-                .orElseGet(() -> ClientSnapshotEntity.builder()
-                        .clientId(event.getClientId())
-                        .createdAt(LocalDateTime.now())
-                        .build());
-
-        boolean isNew = snapshot.getId() == null;
-
-        snapshot.setPersonId(event.getPersonId());
-        snapshot.setRoleId(event.getRoleId());
-        snapshot.setClientCode(event.getClientCode());
-        snapshot.setFullName(event.getFullName());
-        snapshot.setIdentificationNumber(event.getIdentificationNumber());
-        snapshot.setEmail(event.getEmail());
-        snapshot.setPhoneNumber(event.getPhoneNumber());
-        snapshot.setStatus(event.getStatus());
-        snapshot.setIsActive(event.getIsActive());
-        snapshot.setSourceEvent("client.created");
-        snapshot.setLastEventAt(event.getEventDate());
-        snapshot.setUpdatedAt(LocalDateTime.now());
-
-        clientSnapshotRepository.save(snapshot);
-
-        if (isNew) {
-            log.info("Client snapshot created for clientId={}", event.getClientId());
-        } else {
-            log.info("Client snapshot updated from created event for clientId={}", event.getClientId());
+        try {
+            upsertSnapshot(event, "client.created");
+            log.info("Client snapshot processed successfully for clientId={} from created event",
+                    event.getClientId());
+        } catch (Exception ex) {
+            log.error("Error processing client.created event for clientId={}, clientCode={}. Error: {}",
+                    event.getClientId(), event.getClientCode(), ex.getMessage(), ex);
+            // Re-lanzar para que RabbitMQ haga retry o envíe a dead-letter queue
+            throw ex;
         }
     }
 
@@ -59,33 +41,90 @@ public class ClientEventConsumer {
         log.info("Received client.updated event for clientId={}, clientCode={}",
                 event.getClientId(), event.getClientCode());
 
-        ClientSnapshotEntity snapshot = clientSnapshotRepository.findByClientId(event.getClientId())
-                .orElseGet(() -> ClientSnapshotEntity.builder()
-                        .clientId(event.getClientId())
-                        .createdAt(LocalDateTime.now())
-                        .build());
+        try {
+            upsertSnapshot(event, "client.updated");
+            log.info("Client snapshot processed successfully for clientId={} from updated event",
+                    event.getClientId());
+        } catch (Exception ex) {
+            log.error("Error processing client.updated event for clientId={}, clientCode={}. Error: {}",
+                    event.getClientId(), event.getClientCode(), ex.getMessage(), ex);
+            // Re-lanzar para que RabbitMQ haga retry o envíe a dead-letter queue
+            throw ex;
+        }
+    }
+
+    private void upsertSnapshot(Object event, String sourceEvent) {
+        Long clientId = extractClientId(event);
+        String clientCode = extractClientCode(event);
+
+        ClientSnapshotEntity snapshot = clientSnapshotRepository.findByClientId(clientId)
+                .orElseGet(() -> {
+                    log.debug("Creating new snapshot for clientId={}", clientId);
+                    return ClientSnapshotEntity.builder()
+                            .clientId(clientId)
+                            .createdAt(LocalDateTime.now())
+                            .build();
+                });
 
         boolean isNew = snapshot.getId() == null;
 
-        snapshot.setPersonId(event.getPersonId());
-        snapshot.setRoleId(event.getRoleId());
-        snapshot.setClientCode(event.getClientCode());
-        snapshot.setFullName(event.getFullName());
-        snapshot.setIdentificationNumber(event.getIdentificationNumber());
-        snapshot.setEmail(event.getEmail());
-        snapshot.setPhoneNumber(event.getPhoneNumber());
-        snapshot.setStatus(event.getStatus());
-        snapshot.setIsActive(event.getIsActive());
-        snapshot.setSourceEvent("client.updated");
-        snapshot.setLastEventAt(event.getEventDate());
+        // Mapear campos comunes
+        mapCommonFields(snapshot, event);
+
+        snapshot.setSourceEvent(sourceEvent);
+        snapshot.setLastEventAt(LocalDateTime.now());
         snapshot.setUpdatedAt(LocalDateTime.now());
 
         clientSnapshotRepository.save(snapshot);
 
         if (isNew) {
-            log.info("Client snapshot created from updated event for clientId={}", event.getClientId());
+            log.debug("Created new client snapshot for clientId={}", clientId);
         } else {
-            log.info("Client snapshot updated for clientId={}", event.getClientId());
+            log.debug("Updated existing client snapshot for clientId={}", clientId);
+        }
+    }
+
+    private Long extractClientId(Object event) {
+        if (event instanceof ClientCreatedEvent) {
+            return ((ClientCreatedEvent) event).getClientId();
+        } else if (event instanceof ClientUpdatedEvent) {
+            return ((ClientUpdatedEvent) event).getClientId();
+        }
+        throw new IllegalArgumentException("Unknown event type: " + event.getClass());
+    }
+
+    private String extractClientCode(Object event) {
+        if (event instanceof ClientCreatedEvent) {
+            return ((ClientCreatedEvent) event).getClientCode();
+        } else if (event instanceof ClientUpdatedEvent) {
+            return ((ClientUpdatedEvent) event).getClientCode();
+        }
+        throw new IllegalArgumentException("Unknown event type: " + event.getClass());
+    }
+
+    private void mapCommonFields(ClientSnapshotEntity snapshot, Object event) {
+        if (event instanceof ClientCreatedEvent) {
+            ClientCreatedEvent e = (ClientCreatedEvent) event;
+            snapshot.setPersonId(e.getPersonId());
+            snapshot.setRoleId(e.getRoleId());
+            snapshot.setClientCode(e.getClientCode());
+            snapshot.setFullName(e.getFullName());
+            snapshot.setIdentificationNumber(e.getIdentificationNumber());
+            snapshot.setEmail(e.getEmail());
+            snapshot.setPhoneNumber(e.getPhoneNumber());
+            snapshot.setStatus(e.getStatus());
+            snapshot.setIsActive(e.getIsActive());
+        } else if (event instanceof ClientUpdatedEvent) {
+            ClientUpdatedEvent e = (ClientUpdatedEvent) event;
+            snapshot.setPersonId(e.getPersonId());
+            snapshot.setRoleId(e.getRoleId());
+            snapshot.setClientCode(e.getClientCode());
+            snapshot.setFullName(e.getFullName());
+            snapshot.setIdentificationNumber(e.getIdentificationNumber());
+            snapshot.setEmail(e.getEmail());
+            snapshot.setPhoneNumber(e.getPhoneNumber());
+            snapshot.setStatus(e.getStatus());
+            snapshot.setIsActive(e.getIsActive());
         }
     }
 }

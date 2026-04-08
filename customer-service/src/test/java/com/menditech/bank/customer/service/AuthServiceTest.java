@@ -7,6 +7,7 @@ import com.menditech.bank.customer.enums.ClientStatus;
 import com.menditech.bank.customer.exception.InvalidCredentialsException;
 import com.menditech.bank.customer.repository.ClientRepository;
 import com.menditech.bank.customer.security.JwtService;
+import com.menditech.bank.customer.service.serviceImpl.AuthServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,24 +38,30 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    // ✅ CORRECCIÓN: @InjectMocks debe apuntar a la clase concreta, no a la interfaz.
+    // Mockito instancia la clase e inyecta los @Mock declarados arriba.
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
     @BeforeEach
     void setUp() throws Exception {
-        // Inyectar el valor de @Value manualmente vía reflexión
-        Field expirationField = AuthService.class.getDeclaredField("tokenExpirationSeconds");
+        // Inyectar el valor de @Value manualmente vía reflexión.
+        // Ahora la clase es AuthServiceImpl, no la interfaz AuthService.
+        Field expirationField = AuthServiceImpl.class.getDeclaredField("tokenExpirationSeconds");
         expirationField.setAccessible(true);
         expirationField.set(authService, 3600L);
     }
 
+    // -----------------------------------------------------------------------
+    // Login exitoso — failedLoginAttempts ya es 0, no se persiste
+    // -----------------------------------------------------------------------
     @Test
     void shouldLoginSuccessfully() {
         // given
-        String clientCode = "CLI2722163663";
-        String rawPassword = "1234";
+        String clientCode    = "CLI2722163663";
+        String rawPassword   = "1234";
         String hashedPassword = "$2a$10$Ta/ZwTffYi5XisR/X8nwNu/4FpOFs/F9GFh0UtXJFFZGs/IzdfbV2";
-        String mockToken = "mock-jwt-token";
+        String mockToken     = "mock-jwt-token";
 
         LoginRequest request = LoginRequest.builder()
                 .clientCode(clientCode)
@@ -68,7 +75,7 @@ class AuthServiceTest {
                 .status(ClientStatus.ACTIVE)
                 .isActive(true)
                 .isLocked(false)
-                .failedLoginAttempts(0)  // Empieza en 0, no se guardará
+                .failedLoginAttempts(0)   // ya en 0 → resetFailedAttempts no persiste
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -87,15 +94,20 @@ class AuthServiceTest {
         assertEquals(3600L, result.getExpiresIn());
 
         verify(userSessionService).registerSession(client, mockToken, 3600L);
-        verify(clientRepository, never()).save(client);  // ← Verificar que NO se llama
+        // failedLoginAttempts == 0 → resetFailedAttempts() no llama a save()
+        verify(clientRepository, never()).save(client);
     }
+
+    // -----------------------------------------------------------------------
+    // Login exitoso — había intentos previos, se resetean y persisten
+    // -----------------------------------------------------------------------
     @Test
     void shouldLoginSuccessfullyAndResetFailedAttempts() {
         // given
-        String clientCode = "CLI2722163663";
-        String rawPassword = "1234";
+        String clientCode    = "CLI2722163663";
+        String rawPassword   = "1234";
         String hashedPassword = "$2a$10$Ta/ZwTffYi5XisR/X8nwNu/4FpOFs/F9GFh0UtXJFFZGs/IzdfbV2";
-        String mockToken = "mock-jwt-token";
+        String mockToken     = "mock-jwt-token";
 
         LoginRequest request = LoginRequest.builder()
                 .clientCode(clientCode)
@@ -109,7 +121,7 @@ class AuthServiceTest {
                 .status(ClientStatus.ACTIVE)
                 .isActive(true)
                 .isLocked(false)
-                .failedLoginAttempts(3)  // ← Tiene intentos previos
+                .failedLoginAttempts(3)   // ← tiene intentos previos → se resetean
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -123,13 +135,20 @@ class AuthServiceTest {
 
         // then
         assertNotNull(result);
-        assertEquals(0, client.getFailedLoginAttempts());  // ← Verifica que se reseteó
+        assertEquals(0, client.getFailedLoginAttempts());
 
         verify(userSessionService).registerSession(client, mockToken, 3600L);
-        verify(clientRepository).save(client);  // ← Ahora SÍ se verifica
+        verify(clientRepository).save(client);   // resetFailedAttempts() persiste
     }
+
+    // -----------------------------------------------------------------------
+    // Contraseña incorrecta — se lanza excepción, no se crea sesión
+    // -----------------------------------------------------------------------
     @Test
     void shouldThrowExceptionWhenPasswordIsInvalid() {
+        // given
+        String hash = "$2a$10$Ta/ZwTffYi5XisR/X8nwNu/4FpOFs/F9GFh0UtXJFFZGs/IzdfbV2";
+
         LoginRequest request = LoginRequest.builder()
                 .clientCode("CLI2722163663")
                 .password("wrong-password")
@@ -138,7 +157,7 @@ class AuthServiceTest {
         ClientEntity client = ClientEntity.builder()
                 .id(1L)
                 .code("CLI2722163663")
-                .passwordHash("$2a$10$Ta/ZwTffYi5XisR/X8nwNu/4FpOFs/F9GFh0UtXJFFZGs/IzdfbV2")
+                .passwordHash(hash)
                 .status(ClientStatus.ACTIVE)
                 .isActive(true)
                 .isLocked(false)
@@ -148,8 +167,9 @@ class AuthServiceTest {
                 .build();
 
         when(clientRepository.findByCode("CLI2722163663")).thenReturn(Optional.of(client));
-        when(passwordEncoder.matches("wrong-password", "$2a$10$Ta/ZwTffYi5XisR/X8nwNu/4FpOFs/F9GFh0UtXJFFZGs/IzdfbV2")).thenReturn(false);
+        when(passwordEncoder.matches("wrong-password", hash)).thenReturn(false);
 
+        // when / then
         InvalidCredentialsException exception = assertThrows(
                 InvalidCredentialsException.class,
                 () -> authService.login(request)
@@ -157,5 +177,96 @@ class AuthServiceTest {
 
         assertEquals("Invalid client code or password", exception.getMessage());
         verify(userSessionService, never()).registerSession(any(), anyString(), anyLong());
+        // handleFailedAttempt() llama a save() para persistir el contador
+        verify(clientRepository).save(client);
+    }
+
+    // -----------------------------------------------------------------------
+    // Cliente inactivo — se lanza excepción antes de verificar contraseña
+    // -----------------------------------------------------------------------
+    @Test
+    void shouldThrowExceptionWhenClientIsInactive() {
+        LoginRequest request = LoginRequest.builder()
+                .clientCode("CLI0000000001")
+                .password("1234")
+                .build();
+
+        ClientEntity client = ClientEntity.builder()
+                .id(2L)
+                .code("CLI0000000001")
+                .passwordHash("hash")
+                .status(ClientStatus.INACTIVE)
+                .isActive(false)
+                .isLocked(false)
+                .failedLoginAttempts(0)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        when(clientRepository.findByCode("CLI0000000001")).thenReturn(Optional.of(client));
+
+        InvalidCredentialsException exception = assertThrows(
+                InvalidCredentialsException.class,
+                () -> authService.login(request)
+        );
+
+        assertEquals("Client is inactive", exception.getMessage());
+        verify(passwordEncoder, never()).matches(any(), any());
+        verify(userSessionService, never()).registerSession(any(), any(), anyLong());
+    }
+
+    // -----------------------------------------------------------------------
+    // Cliente bloqueado — se lanza excepción antes de verificar contraseña
+    // -----------------------------------------------------------------------
+    @Test
+    void shouldThrowExceptionWhenClientIsLocked() {
+        LoginRequest request = LoginRequest.builder()
+                .clientCode("CLI0000000002")
+                .password("1234")
+                .build();
+
+        ClientEntity client = ClientEntity.builder()
+                .id(3L)
+                .code("CLI0000000002")
+                .passwordHash("hash")
+                .status(ClientStatus.ACTIVE)
+                .isActive(true)
+                .isLocked(true)
+                .failedLoginAttempts(5)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        when(clientRepository.findByCode("CLI0000000002")).thenReturn(Optional.of(client));
+
+        InvalidCredentialsException exception = assertThrows(
+                InvalidCredentialsException.class,
+                () -> authService.login(request)
+        );
+
+        assertEquals("Client is locked. Please contact support.", exception.getMessage());
+        verify(passwordEncoder, never()).matches(any(), any());
+        verify(userSessionService, never()).registerSession(any(), any(), anyLong());
+    }
+
+    // -----------------------------------------------------------------------
+    // Código de cliente no existe — excepción genérica (evita enumeración)
+    // -----------------------------------------------------------------------
+    @Test
+    void shouldThrowExceptionWhenClientCodeDoesNotExist() {
+        LoginRequest request = LoginRequest.builder()
+                .clientCode("CLI9999999999")
+                .password("1234")
+                .build();
+
+        when(clientRepository.findByCode("CLI9999999999")).thenReturn(Optional.empty());
+
+        InvalidCredentialsException exception = assertThrows(
+                InvalidCredentialsException.class,
+                () -> authService.login(request)
+        );
+
+        assertEquals("Invalid client code or password", exception.getMessage());
+        verify(passwordEncoder, never()).matches(any(), any());
     }
 }
