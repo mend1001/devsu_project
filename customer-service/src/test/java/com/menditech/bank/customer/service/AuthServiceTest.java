@@ -39,15 +39,12 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    // ✅ CORRECCIÓN: @InjectMocks debe apuntar a la clase concreta, no a la interfaz.
-    // Mockito instancia la clase e inyecta los @Mock declarados arriba.
     @InjectMocks
     private AuthServiceImpl authService;
 
     @BeforeEach
     void setUp() throws Exception {
-        // Inyectar el valor de @Value manualmente vía reflexión.
-        // Ahora la clase es AuthServiceImpl, no la interfaz AuthService.
+
         Field expirationField = AuthServiceImpl.class.getDeclaredField("tokenExpirationSeconds");
         expirationField.setAccessible(true);
         expirationField.set(authService, 3600L);

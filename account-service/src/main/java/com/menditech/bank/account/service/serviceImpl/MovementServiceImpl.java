@@ -15,7 +15,7 @@ import com.menditech.bank.account.repository.MovementRepository;
 import com.menditech.bank.account.repository.MovementTypeRepository;
 import com.menditech.bank.account.repository.TransactionChannelRepository;
 
-import com.menditech.bank.account.service.BalanceCalculator;
+import com.menditech.bank.account.service.BalanceService;
 import com.menditech.bank.account.service.MovementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class MovementServiceImpl implements MovementService {
     private final TransactionChannelRepository transactionChannelRepository;
     private final MovementRepository movementRepository;
     private final MovementMapper movementMapper;
-    private final BalanceCalculator balanceCalculator;
+    private final BalanceService balanceCalculator;
 
     @Override
     @Transactional

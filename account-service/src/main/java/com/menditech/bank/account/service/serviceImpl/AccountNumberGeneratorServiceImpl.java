@@ -2,7 +2,7 @@ package com.menditech.bank.account.service.serviceImpl;
 
 import com.menditech.bank.account.enums.AccountTypeConfig;
 import com.menditech.bank.account.repository.AccountRepository;
-import com.menditech.bank.account.service.AccountNumberGenerator;
+import com.menditech.bank.account.service.AccountNumberGeneratorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AccountNumberGeneratorServiceImpl implements AccountNumberGenerator {
+public class AccountNumberGeneratorServiceImpl implements AccountNumberGeneratorService {
 
     private final AccountRepository accountRepository;
 

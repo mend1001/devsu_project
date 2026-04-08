@@ -11,7 +11,7 @@ import com.menditech.bank.account.exception.ResourceNotFoundException;
 import com.menditech.bank.account.mapper.AccountMapper;
 import com.menditech.bank.account.repository.AccountRepository;
 import com.menditech.bank.account.repository.AccountTypeRepository;
-import com.menditech.bank.account.service.AccountNumberGenerator;
+import com.menditech.bank.account.service.AccountNumberGeneratorService;
 import com.menditech.bank.account.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final AccountTypeRepository accountTypeRepository;
     private final AccountMapper accountMapper;
-    private final AccountNumberGenerator accountNumberGenerator;
+    private final AccountNumberGeneratorService accountNumberGenerator;
 
     @Override
     @Transactional

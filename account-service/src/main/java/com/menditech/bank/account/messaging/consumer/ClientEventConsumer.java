@@ -31,7 +31,6 @@ public class ClientEventConsumer {
         } catch (Exception ex) {
             log.error("Error processing client.created event for clientId={}, clientCode={}. Error: {}",
                     event.getClientId(), event.getClientCode(), ex.getMessage(), ex);
-            // Re-lanzar para que RabbitMQ haga retry o envíe a dead-letter queue
             throw ex;
         }
     }
@@ -48,7 +47,6 @@ public class ClientEventConsumer {
         } catch (Exception ex) {
             log.error("Error processing client.updated event for clientId={}, clientCode={}. Error: {}",
                     event.getClientId(), event.getClientCode(), ex.getMessage(), ex);
-            // Re-lanzar para que RabbitMQ haga retry o envíe a dead-letter queue
             throw ex;
         }
     }
@@ -68,7 +66,6 @@ public class ClientEventConsumer {
 
         boolean isNew = snapshot.getId() == null;
 
-        // Mapear campos comunes
         mapCommonFields(snapshot, event);
 
         snapshot.setSourceEvent(sourceEvent);

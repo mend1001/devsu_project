@@ -51,7 +51,6 @@ public class StatementServiceImpl implements StatementService {
         LocalDateTime from = request.getStartDate().atStartOfDay();
         LocalDateTime to = request.getEndDate().atTime(END_OF_DAY);
 
-        // Una sola query para todos los movimientos (evita N+1)
         List<MovementResponse> allMovements = fetchMovements(request.getClientId(), from, to);
 
         Map<Long, List<MovementResponse>> movementsByAccount = groupMovementsByAccount(allMovements);

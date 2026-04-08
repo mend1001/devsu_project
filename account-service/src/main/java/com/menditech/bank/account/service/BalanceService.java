@@ -4,6 +4,6 @@ import com.menditech.bank.account.entity.MovementTypeEntity;
 
 import java.math.BigDecimal;
 
-public interface BalanceCalculator {
+public interface BalanceService {
     void applyMovement(AccountEntity account, MovementTypeEntity movementType, BigDecimal amount);
 }
