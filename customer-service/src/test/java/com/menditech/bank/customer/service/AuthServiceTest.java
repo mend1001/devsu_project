@@ -8,6 +8,7 @@ import com.menditech.bank.customer.exception.InvalidCredentialsException;
 import com.menditech.bank.customer.repository.ClientRepository;
 import com.menditech.bank.customer.security.JwtService;
 import com.menditech.bank.customer.service.serviceImpl.AuthServiceImpl;
+import com.menditech.bank.customer.service.serviceImpl.UserSessionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,7 @@ class AuthServiceTest {
     private JwtService jwtService;
 
     @Mock
-    private UserSessionService userSessionService;
+    private UserSessionServiceImpl userSessionService;
 
     @Mock
     private PasswordEncoder passwordEncoder;

@@ -160,11 +160,12 @@ public class AccountServiceImpl implements AccountService {
             log.warn("Attempt to close account {} with non-zero balance: {}", accountNumber, account.getCurrentBalance());
             throw new BusinessException("Cannot close account with non-zero balance. Current balance: " + account.getCurrentBalance());
         }
+        LocalDateTime now = LocalDateTime.now();
 
         account.setStatus(AccountStatus.CLOSED);
         account.setIsActive(false);
-        account.setClosedAt(LocalDateTime.now());
-        account.setUpdatedAt(LocalDateTime.now());
+        account.setClosedAt(now);
+        account.setUpdatedAt(now);
         account.setUpdatedBy(getCurrentUser());
 
         accountRepository.save(account);

@@ -25,7 +25,7 @@ class BalanceServiceTest {
                 .build();
 
         MovementTypeEntity movementType = MovementTypeEntity.builder()
-                .sign(MovementSign.CREDIT)
+                .sign(MovementSign.CREDIT.getValue())
                 .build();
 
         balanceService.applyMovement(account, movementType, new BigDecimal("500.00"));
@@ -44,7 +44,7 @@ class BalanceServiceTest {
                 .build();
 
         MovementTypeEntity movementType = MovementTypeEntity.builder()
-                .sign(MovementSign.DEBIT)
+                .sign(MovementSign.DEBIT.getValue())
                 .build();
 
         balanceService.applyMovement(account, movementType, new BigDecimal("300.00"));
@@ -63,7 +63,7 @@ class BalanceServiceTest {
                 .build();
 
         MovementTypeEntity movementType = MovementTypeEntity.builder()
-                .sign(MovementSign.DEBIT)
+                .sign(MovementSign.DEBIT.getValue())
                 .build();
 
         InsufficientBalanceException exception = assertThrows(

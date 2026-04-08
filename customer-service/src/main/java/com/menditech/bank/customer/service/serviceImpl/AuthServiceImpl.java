@@ -8,7 +8,6 @@ import com.menditech.bank.customer.exception.InvalidCredentialsException;
 import com.menditech.bank.customer.repository.ClientRepository;
 import com.menditech.bank.customer.security.JwtService;
 import com.menditech.bank.customer.service.AuthService;
-import com.menditech.bank.customer.service.UserSessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final ClientRepository clientRepository;
     private final JwtService jwtService;
-    private final UserSessionService userSessionService;
+    private final UserSessionServiceImpl userSessionService;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional

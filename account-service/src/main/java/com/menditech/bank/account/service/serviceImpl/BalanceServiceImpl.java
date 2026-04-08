@@ -27,7 +27,7 @@ public class BalanceServiceImpl implements BalanceCalculator {
         BigDecimal current = account.getCurrentBalance();
         BigDecimal newBalance;
 
-        if (movementType.getSign() == MovementSign.CREDIT) {
+        if (MovementSign.fromSign(movementType.getSign()) == MovementSign.CREDIT) {
             newBalance = current.add(amount);
             log.debug("Applying credit of {} to account {}", amount, account.getId());
         } else {
