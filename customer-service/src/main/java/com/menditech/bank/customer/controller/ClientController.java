@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,14 +62,20 @@ public class ClientController {
         );
     }
 
-    @Operation(summary = "Get all clients", description = "Returns the list of all registered clients.")
+    @Operation(
+            summary = "Get all clients with pagination",
+            description = "Returns a paginated list of all registered clients. Supports page number, size, and sorting parameters."
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Clients retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping
-    public ResponseEntity<ApiCommonResponse<List<ClientResponse>>> getAllClients() {
-        List<ClientResponse> response = clientService.getAllClients();
+    public ResponseEntity<ApiCommonResponse<Page<ClientResponse>>> getAllClients(
+            @Parameter(description = "Pagination parameters (page, size, sort). Example: ?page=0&size=10&sort=id,desc")
+            Pageable pageable
+    ) {
+        Page<ClientResponse> response = clientService.getAllClients(pageable);
         return ResponseEntity.ok(
                 ApiResponseBuilder.success(HttpStatus.OK, "Clients retrieved successfully", response)
         );

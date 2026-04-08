@@ -128,7 +128,7 @@ class AccountServiceTest {
                 () -> accountService.createAccount(request)
         );
 
-        assertEquals("Account type not found", exception.getMessage());
+        assertEquals("Account type not found: SAVINGS", exception.getMessage());
         verify(accountRepository, never()).save(any());
     }
 
