@@ -1,5 +1,5 @@
 package com.menditech.bank.account.service;
 
-public interface AccountNumberGenerator {
+public interface AccountNumberGeneratorService {
     String generateNextAccountNumber(String accountTypeCode);
 }

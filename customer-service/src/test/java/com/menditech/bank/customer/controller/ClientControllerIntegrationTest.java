@@ -122,7 +122,6 @@ class ClientControllerIntegrationTest {
                 .andExpect(jsonPath("$.httpStatus").value(200))
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.message").value("Clients retrieved successfully"))
-                // Estructura de Page<T> dentro de data
                 .andExpect(jsonPath("$.data.content").isArray())
                 .andExpect(jsonPath("$.data.totalElements").value(greaterThan(0)))
                 .andExpect(jsonPath("$.data.totalPages").exists())

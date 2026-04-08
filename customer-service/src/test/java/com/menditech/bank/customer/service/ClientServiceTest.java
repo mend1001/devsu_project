@@ -39,9 +39,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ClientServiceTest {
 
-    // -----------------------------------------------------------------------
-    // Mocks — uno por cada dependencia del servicio
-    // -----------------------------------------------------------------------
     @Mock private ClientRepository clientRepository;
     @Mock private PersonRepository personRepository;
     @Mock private RoleRepository roleRepository;
@@ -52,14 +49,8 @@ class ClientServiceTest {
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private ClientEventPublisher clientEventPublisher;
 
-    // ✅ @InjectMocks apunta a la clase concreta del paquete serviceImpl,
-    //    no a la interfaz ClientService.
     @InjectMocks
     private ClientServiceImpl clientService;
-
-    // -----------------------------------------------------------------------
-    // Fixtures — inicializadas en @BeforeEach para aislar cada test
-    // -----------------------------------------------------------------------
     private ClientCreateRequest request;
     private CountryEntity country;
     private CountryPhoneCodeEntity phoneCode;
@@ -180,13 +171,6 @@ class ClientServiceTest {
         verify(clientEventPublisher).publishClientCreated(any());
     }
 
-    // -----------------------------------------------------------------------
-    // createClient — cédula duplicada
-    //
-    // validateCreateRequest() valida PRIMERO la cédula.
-    // Mensaje exacto del código real: "Identification number already exists"
-    // Cuando falla aquí, el email nunca se consulta.
-    // -----------------------------------------------------------------------
     @Test
     void shouldThrowExceptionWhenIdentificationNumberAlreadyExists() {
         when(personRepository.existsByIdentificationNumber("123456789")).thenReturn(true);
@@ -203,12 +187,6 @@ class ClientServiceTest {
         verify(personRepository, never()).save(any());
     }
 
-    // -----------------------------------------------------------------------
-    // createClient — email duplicado
-    //
-    // Para llegar al chequeo de email, la cédula debe pasar (retornar false).
-    // Mensaje exacto del código real: "Email already exists"
-    // -----------------------------------------------------------------------
     @Test
     void shouldThrowExceptionWhenEmailAlreadyExists() {
         // La cédula pasa → se llega al chequeo del email
@@ -300,12 +278,6 @@ class ClientServiceTest {
         assertEquals("Client not found", ex.getMessage());
     }
 
-    // -----------------------------------------------------------------------
-    // deleteClient — soft-delete exitoso
-    //
-    // deleteClient() también llama a personRepository.save() y
-    // publishClientUpdated(), por eso se stubbea y verifica ambos.
-    // -----------------------------------------------------------------------
     @Test
     void shouldDeactivateClientSuccessfully() {
         when(clientRepository.findById(1L)).thenReturn(Optional.of(savedClient));
