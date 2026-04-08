@@ -4,7 +4,7 @@ import com.menditech.bank.account.dto.common.ApiCommonResponse;
 import com.menditech.bank.account.dto.request.AccountCreateRequest;
 import com.menditech.bank.account.dto.request.AccountUpdateRequest;
 import com.menditech.bank.account.dto.response.AccountResponse;
-import com.menditech.bank.account.service.AccountService;
+import com.menditech.bank.account.service.serviceImpl.AccountServiceImpl;
 import com.menditech.bank.account.util.ApiResponseBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +28,7 @@ import java.util.List;
 @Tag(name = "Accounts", description = "Operations related to bank accounts")
 public class AccountController {
 
-    private final AccountService accountService;
+    private final AccountServiceImpl accountService;
 
     @Operation(
             summary = "Create a new bank account",

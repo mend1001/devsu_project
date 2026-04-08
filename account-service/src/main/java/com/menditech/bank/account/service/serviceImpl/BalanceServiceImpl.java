@@ -1,10 +1,10 @@
-package com.menditech.bank.account.service;
+package com.menditech.bank.account.service.serviceImpl;
 
 import com.menditech.bank.account.entity.AccountEntity;
 import com.menditech.bank.account.entity.MovementTypeEntity;
 import com.menditech.bank.account.exception.BusinessException;
 import com.menditech.bank.account.exception.InsufficientBalanceException;
-import com.menditech.bank.account.service.serviceImpl.BalanceCalculator;
+import com.menditech.bank.account.service.BalanceCalculator;
 import com.menditech.bank.account.util.MovementSign;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 
 @Slf4j
 @Service
-public class BalanceService implements BalanceCalculator {
+public class BalanceServiceImpl implements BalanceCalculator {
 
     private static final String INSUFFICIENT_BALANCE_MSG = "Insufficient balance for this operation";
     private static final String INVALID_AMOUNT_MSG = "Movement amount must be positive";

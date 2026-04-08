@@ -10,6 +10,7 @@ import com.menditech.bank.account.enums.AccountStatus;
 import com.menditech.bank.account.mapper.MovementMapper;
 import com.menditech.bank.account.repository.AccountRepository;
 import com.menditech.bank.account.repository.MovementRepository;
+import com.menditech.bank.account.service.serviceImpl.StatementServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,7 +38,7 @@ class StatementServiceTest {
     private MovementMapper movementMapper;
 
     @InjectMocks
-    private StatementService statementService;
+    private StatementServiceImpl statementService;
 
     @Test
     void shouldGenerateStatementSuccessfully() {

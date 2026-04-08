@@ -9,6 +9,8 @@ import com.menditech.bank.account.exception.ResourceNotFoundException;
 import com.menditech.bank.account.mapper.AccountMapper;
 import com.menditech.bank.account.repository.AccountRepository;
 import com.menditech.bank.account.repository.AccountTypeRepository;
+import com.menditech.bank.account.service.serviceImpl.AccountNumberGeneratorServiceImpl;
+import com.menditech.bank.account.service.serviceImpl.AccountServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,10 +38,10 @@ class AccountServiceTest {
     private AccountMapper accountMapper;
 
     @Mock
-    private AccountNumberGeneratorService accountNumberGeneratorService;
+    private AccountNumberGeneratorServiceImpl accountNumberGeneratorService;
 
     @InjectMocks
-    private AccountService accountService;
+    private AccountServiceImpl accountService;
 
     @Test
     void shouldCreateAccountSuccessfully() {

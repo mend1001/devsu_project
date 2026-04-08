@@ -3,6 +3,7 @@ package com.menditech.bank.account.service;
 import com.menditech.bank.account.entity.AccountEntity;
 import com.menditech.bank.account.entity.MovementTypeEntity;
 import com.menditech.bank.account.exception.InsufficientBalanceException;
+import com.menditech.bank.account.service.serviceImpl.BalanceServiceImpl;
 import com.menditech.bank.account.util.MovementSign;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BalanceServiceTest {
 
-    private final BalanceService balanceService = new BalanceService();
+    private final BalanceServiceImpl balanceService = new BalanceServiceImpl();
 
     @Test
     void shouldApplyDepositSuccessfully() {
